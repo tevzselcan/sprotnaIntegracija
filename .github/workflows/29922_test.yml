@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_tests:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout kode
@@ -32,7 +32,7 @@ jobs:
 
   run_tests:
     needs: check_tests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
