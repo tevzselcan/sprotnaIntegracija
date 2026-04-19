@@ -1,0 +1,69 @@
+name: 29922_test
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  check_tests:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Preveri če testi obstajajo
+        run: |
+          if [ ! -d "tests" ]; then
+            echo "Manjako testi!" > napaka.txt
+            exit 1
+          fi
+
+      - name: Shrani napake v artifact
+        if: always()
+        run: |
+          touch napaka.txt
+
+      - name: Upload napaka artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: napaka
+          path: napaka.txt
+
+  run_tests:
+    needs: check_tests
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        python-version: [3.10, 3.11]
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: napaka
+
+      - name: Preveri napako.txt
+        run: |
+          if [ -s napaka.txt ]; then
+            echo "Napaka iz prvega joba:"
+            cat napaka.txt
+            exit 1
+          fi
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Namesti dependecye
+        run: |
+          pip install -r requirements.txt
+
+      - name: Poženi teste
+        run: |
+          pytest tests/
