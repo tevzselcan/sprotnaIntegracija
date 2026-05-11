@@ -4,5 +4,5 @@ def test_basic_math():
 
 
 def test_string():
-    text = "CI/CD"
-    assert text.lower() == "ci/cd"
+    text = "CI/CA"
+    assert text.lower() == "ci/ca"
